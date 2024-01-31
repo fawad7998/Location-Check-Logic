@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Location App</title>
+    <style>
+      body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+      }
+
+      div {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+
+      button {
+        padding: 10px;
+        background-color: #3498db;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      p {
+        margin: 10px 0;
+        font-size: 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <div>Location</div>
+    <button id="btn">Get your Location</button>
+    <p id="detail">.</p>
+    <p id="detailedAddress">.</p>
+    <p id="fullAddress">.</p>
+
+    <script>
+      document.querySelector('#btn').addEventListener('click', () => {
+        const detail = document.querySelector('#detail');
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const { latitude, longitude } = position.coords;
+              const query = `${latitude},${longitude}`;
+              const key = 'd06c12b5a2fd42d09e912e12011ca1bb';
+              detail.textContent = `Latitude: ${latitude}, Longitude: ${longitude}`;
+              const api = `https://api.opencagedata.com/geocode/v1/json?key=${key}&q=${query}&pretty=1`;
+              async function apiv1() {
+                const res = await fetch(api);
+                const data = await res.json();
+                const { district, municipality, postcode, road, state } =
+                  data.results[0].components;
+                document.querySelector(
+                  '#detailedAddress'
+                ).innerHTML = `<div>District: ${district}${municipality}</div> <div>Road: ${road}</div> <div>Postcode: ${postcode}</div> <div>State: ${state}</div>`;
+              }
+              apiv1();
+            },
+            (error) => {
+              console.log(error);
+            }
+          );
+        }
+      });
+    </script>
+  </body>
+</html>
